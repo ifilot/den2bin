@@ -39,28 +39,36 @@ class Converter {
 private:
 
 public:
-	/**
-	 * @brief      default constructor for Converter object
-	 */
-	Converter();
+    /**
+     * @brief      default constructor for Converter object
+     */
+    Converter();
 
-	/**
-	 * @brief      extract information of binary file and output to terminal
-	 *
-	 * @param[in]  filename  path to binary file
-	 */
-	void get_info(const std::string& filename);
+    /**
+     * @brief      extract information of binary file and output to terminal
+     *
+     * @param[in]  filename  path to binary file
+     */
+    void get_info(const std::string& filename);
 
-	/**
-	 * @brief      write density class to binary file
-	 *
-	 * @param[in]  comments    comments to store
-	 * @param[in]  density     density object
-	 * @param[in]  outputfile  output path
-	 *
-	 * @return     filesize
-	 */
-	void write_to_binary(const std::string& comments, const Density& sf, const std::string& outputfile);
+    /**
+     * @brief      write density class to binary file
+     *
+     * @param[in]  comments    comments to store
+     * @param[in]  density     density object
+     * @param[in]  outputfile  output path
+     *
+     */
+    void write_to_binary(const std::string& comments, const Density& sf, const std::string& outputfile);
+
+    /**
+     * @brief      write density class to binary file (raw)
+     *
+     * @param[in]  density     density object
+     * @param[in]  outputfile  output path
+     *
+     */
+    void write_to_binary_raw(const Density& density, const std::string& outputfile);
 private:
 };
 

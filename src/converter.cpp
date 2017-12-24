@@ -31,7 +31,7 @@ Converter::Converter() {}
  * @param[in]  filename  path to binary file
  */
 void Converter::get_info(const std::string& filename) {
-	std::ifstream f(filename);
+    std::ifstream f(filename);
     if(f.is_open()) {
 
         std::stringstream compressed;
@@ -54,25 +54,25 @@ void Converter::get_info(const std::string& filename) {
         // read and output header message
         char* msg = new char[msg_size+1];
         decompressed.read(msg, msg_size);
-        msg[msg_size] = '\0';		// write end of string character
-        std::string msgstr(msg);	// parse char array to std::string
+        msg[msg_size] = '\0';       // write end of string character
+        std::string msgstr(msg);    // parse char array to std::string
         std::cout << "Header message: " << msgstr << std::endl;
-        delete msg;					// we no longer need the memory
+        delete msg;                 // we no longer need the memory
 
         // read the dimensions of the unit cell
         glm::mat3 mat;
         for(unsigned int i=0; i<3; i++) {
-        	for(unsigned int j=0; j<3; j++) {
-        		decompressed.read(buffer, sizeof(float));
-        		mat[i][j] = *(float *)buffer;
-        	}
+            for(unsigned int j=0; j<3; j++) {
+                decompressed.read(buffer, sizeof(float));
+                mat[i][j] = *(float *)buffer;
+            }
         }
 
         // read the grid sizes
         unsigned int gridsize[3];
         for(unsigned int i=0; i<3; i++) {
-    		decompressed.read(buffer, sizeof(uint32_t));
-    		gridsize[i] = *(uint32_t *)buffer;
+            decompressed.read(buffer, sizeof(uint32_t));
+            gridsize[i] = *(uint32_t *)buffer;
         }
         std::cout << "Grid dimension: " << gridsize[0] << "x" << gridsize[1] << "x" << gridsize[2] << std::endl;
 
@@ -107,7 +107,7 @@ void Converter::get_info(const std::string& filename) {
  * @return     filesize
  */
 void Converter::write_to_binary(const std::string& comments, const Density& density, const std::string& outputfile) {
-	std::fstream f(outputfile, std::ios_base::binary | std::ios::out);
+    std::fstream f(outputfile, std::ios_base::binary | std::ios::out);
 
     if(f.good()) {
 
@@ -121,25 +121,25 @@ void Converter::write_to_binary(const std::string& comments, const Density& dens
 
         // write the matrix; 9 floats
         for(unsigned int i=0; i<3; i++) {
-        	for(unsigned int j=0; j<3; j++) {
-        		const float val = density.get_mat_unitcell()[i][j];
-        		origin.write((char*)&val, sizeof(float));
-        	}
+            for(unsigned int j=0; j<3; j++) {
+                const float val = density.get_mat_unitcell()[i][j];
+                origin.write((char*)&val, sizeof(float));
+            }
         }
 
         // write grid dimensions
         unsigned int griddim[3];
         density.copy_grid_dimensions(griddim);
         for(unsigned int i=0; i<3; i++) {
-        	const uint32_t val = griddim[i];
-        	origin.write((char*)&val, sizeof(uint32_t));
+            const uint32_t val = griddim[i];
+            origin.write((char*)&val, sizeof(uint32_t));
         }
 
         // write the grid
         uint32_t gridsize = density.get_size();
         const float* gridptr = density.get_grid_ptr();
         for(unsigned int i=0; i<gridsize; i++) {
-        	origin.write((char*)&gridptr[i], sizeof(float));
+            origin.write((char*)&gridptr[i], sizeof(float));
         }
 
         boost::iostreams::filtering_streambuf<boost::iostreams::input> out;
@@ -148,6 +148,39 @@ void Converter::write_to_binary(const std::string& comments, const Density& dens
         boost::iostreams::copy(out, compressed);
 
         f << compressed.str();
+        f.close();
+
+    } else {
+        std::cerr << "Cannot write to file " << outputfile << std::endl;
+        throw std::runtime_error("Could not write to file");
+    }
+}
+
+/**
+ * @brief      write density class to binary file
+ *
+ * @param[in]  comments    comments to store
+ * @param[in]  density     density object
+ * @param[in]  outputfile  output path
+ *
+ * @return     filesize
+ */
+void Converter::write_to_binary_raw(const Density& density, const std::string& outputfile) {
+    std::fstream f(outputfile, std::ios_base::binary | std::ios::out);
+
+    if(f.good()) {
+
+        std::stringstream compressed;
+        std::stringstream origin;
+
+        // write the grid
+        uint32_t gridsize = density.get_size();
+        const float* gridptr = density.get_grid_ptr();
+        for(unsigned int i=0; i<gridsize; i++) {
+            origin.write((char*)&gridptr[i], sizeof(float));
+        }
+
+        f << origin.str();
         f.close();
 
     } else {

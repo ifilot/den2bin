@@ -46,11 +46,16 @@ int main(int argc, char* argv[]) {
         TCLAP::ValueArg<std::string> arg_message("m","message","Message",false,"","filename");
         cmd.add(arg_message);
 
+        // whether to store raw
+        TCLAP::SwitchArg arg_raw("r","raw","Raw",false);
+        cmd.add(arg_raw);
+
         cmd.parse(argc, argv);
 
         std::string input_filename = arg_input_filename.getValue();
         std::string output_filename = arg_output_filename.getValue();
         std::string message = arg_message.getValue();
+        bool flag_write_raw = arg_raw.getValue();
 
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << "Executing DEN2BIN v.1.0.0" << std::endl;
@@ -71,33 +76,40 @@ int main(int argc, char* argv[]) {
         // output to binary file
         start = std::chrono::system_clock::now();
         Converter cv;
-        cv.write_to_binary(message, den, output_filename);
+        if(flag_write_raw) {
+            cv.write_to_binary_raw(den, output_filename);
+        } else {
+            cv.write_to_binary(message, den, output_filename);
+        }
         end = std::chrono::system_clock::now();
         elapsed_seconds = end-start;
         std::cout << "Constructed " << output_filename << " in " << elapsed_seconds.count() << " seconds." << std::endl;
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << std::endl;
 
-        // calculate compression statistics
-        std::cout << "Compression statistics" << std::endl;
-        std::cout << "-----------------------------------------" << std::endl;
-        boost::filesystem::path ipath(input_filename);
-        boost::filesystem::path opath(output_filename);
-        size_t input_filesize = boost::filesystem::file_size(ipath);
-        size_t output_filesize = boost::filesystem::file_size(opath);
-        std::cout << "Filesize: " << (float)output_filesize / (1024 * 1024) << " mb." << std::endl;
-        const float ratio = (float)input_filesize / (float)output_filesize;
-        std::cout << "Compression ratio: " << ratio << std::endl;
-        std::cout << "-----------------------------------------" << std::endl;
-        std::cout << std::endl;
+        if(!flag_write_raw) {
+            // calculate compression statistics
+            std::cout << "Compression statistics" << std::endl;
+            std::cout << "-----------------------------------------" << std::endl;
+            boost::filesystem::path ipath(input_filename);
+            boost::filesystem::path opath(output_filename);
+            size_t input_filesize = boost::filesystem::file_size(ipath);
+            size_t output_filesize = boost::filesystem::file_size(opath);
+            std::cout << "Filesize: " << (float)output_filesize / (1024 * 1024) << " mb." << std::endl;
+            const float ratio = (float)input_filesize / (float)output_filesize;
+            std::cout << "Compression ratio: " << ratio << std::endl;
+            std::cout << "-----------------------------------------" << std::endl;
+            std::cout << std::endl;
 
-        std:: cout << "Verifying result..." << std::endl;
-        std::cout << "-----------------------------------------" << std::endl;
-        start = std::chrono::system_clock::now();
-        cv.get_info(output_filename);
-        end = std::chrono::system_clock::now();
-        elapsed_seconds = end-start;
-        std::cout << "Verification of results in " << elapsed_seconds.count() << " seconds." << std::endl;
+            std:: cout << "Verifying result..." << std::endl;
+            std::cout << "-----------------------------------------" << std::endl;
+            start = std::chrono::system_clock::now();
+            cv.get_info(output_filename);
+            end = std::chrono::system_clock::now();
+            elapsed_seconds = end-start;
+            std::cout << "Verification of results in " << elapsed_seconds.count() << " seconds." << std::endl;
+        }
+
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << "Done" << std::endl;
 
