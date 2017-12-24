@@ -107,7 +107,7 @@ int main(int argc, char* argv[]) {
             if(flag_write_raw) {
                 cv.write_to_binary_raw(den, output_filename);
             } else if(flag_write_lossy) {
-                cv.write_to_binary_lossy(message, den, output_filename, 4, 3);
+                cv.write_to_binary_lossy(message, den, output_filename, 4, 2);
             }else {
                 cv.write_to_binary(message, den, output_filename);
             }
