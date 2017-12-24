@@ -43,6 +43,13 @@ else()
     SET(BOOST_LIBRARYDIR "/usr/lib/x86_64-linux-gnu")
 endif()
 
+find_package(OpenMP)
+if (OPENMP_FOUND)
+    option(HAS_OPENMP "OpenMP enabled" ON)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 # set Boost
 set (Boost_NO_SYSTEM_PATHS ON)
 set (Boost_USE_MULTITHREADED ON)

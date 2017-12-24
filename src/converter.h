@@ -25,18 +25,29 @@
 #include <stdexcept>
 #include <fstream>
 #include <iostream>
+#include <chrono>
 
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
+#include <boost/format.hpp>
 
 #include "density.h"
+#include "compressor.h"
 
 /**
  * @brief      converter class that outputs density to binary file
  */
 class Converter {
 private:
+    std::vector<float> coeff;
+    std::vector<float> data;
+
+    size_t blocksize;
+    size_t coeffsize;
+
+    unsigned int griddim[3];
+    glm::mat3 mat;
 
 public:
     /**
@@ -62,6 +73,17 @@ public:
     void write_to_binary(const std::string& comments, const Density& sf, const std::string& outputfile);
 
     /**
+     * @brief      write density class to binary file in a lossy format (using DCT)
+     *
+     * @param[in]  comments    comments to store
+     * @param[in]  density     density object
+     * @param[in]  outputfile  output path
+     *
+     * @return     filesize
+     */
+    void write_to_binary_lossy(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize);
+
+    /**
      * @brief      write density class to binary file (raw)
      *
      * @param[in]  density     density object
@@ -69,6 +91,13 @@ public:
      *
      */
     void write_to_binary_raw(const Density& density, const std::string& outputfile);
+
+    /**
+     * @brief      rebuild CHGCAR / LOCPOT from data
+     *
+     * @param[in]  filename  path to CHGCAR / LOCPOT file
+     */
+    void build_density(const std::string& filename);
 private:
 };
 

@@ -62,7 +62,7 @@ private:
     unsigned int value_count;
 
 public:
-    
+
     /**
      * @brief      default constructor
      *
@@ -188,6 +188,15 @@ public:
      */
     inline const float* get_grid_ptr() const {
         return &this->gridptr[0];
+    }
+
+    /**
+     * @brief      Get a reference to the grid point vector.
+     *
+     * @return     The grid pointer.
+     */
+    inline const std::vector<float>& get_grid_vec() const {
+        return this->gridptr;
     }
 
     /**
