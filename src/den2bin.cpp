@@ -54,6 +54,14 @@ int main(int argc, char* argv[]) {
         TCLAP::SwitchArg arg_lossy("l","lossy","Lossy",false);
         cmd.add(arg_lossy);
 
+        // block size
+        TCLAP::ValueArg<unsigned int> arg_block_size("b","blocksize","Block size",false,4,"blocksize");
+        cmd.add(arg_block_size);
+
+        // quality
+        TCLAP::ValueArg<unsigned int> arg_quality("q","quality","Quality",false,2,"quality");
+        cmd.add(arg_quality);
+
         // whether to extract data in lossy format
         TCLAP::SwitchArg arg_extract("x","extract","Extract",false);
         cmd.add(arg_extract);
@@ -66,9 +74,11 @@ int main(int argc, char* argv[]) {
         bool flag_write_raw = arg_raw.getValue();
         bool flag_write_lossy = arg_lossy.getValue();
         bool flag_extract = arg_extract.getValue();
+        unsigned int blocksize = arg_block_size.getValue();
+        unsigned int quality = arg_quality.getValue();
 
         std::cout << "-----------------------------------------" << std::endl;
-        std::cout << "Executing DEN2BIN v.1.1.1" << std::endl;
+        std::cout << "Executing DEN2BIN v.1.1.2" << std::endl;
         std::cout << "Author: Ivo Filot <i.a.w.filot@tue.nl>" << std::endl;
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << std::endl;
@@ -107,7 +117,7 @@ int main(int argc, char* argv[]) {
             if(flag_write_raw) {
                 cv.write_to_binary_raw(den, output_filename);
             } else if(flag_write_lossy) {
-                cv.write_to_binary_lossy(message, den, output_filename, 4, 2);
+                cv.write_to_binary_lossy(message, den, output_filename, blocksize, quality);
             }else {
                 cv.write_to_binary(message, den, output_filename);
             }

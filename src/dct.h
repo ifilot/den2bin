@@ -26,14 +26,16 @@
 #include <cmath>
 #include <fftw3.h>
 #include <complex>
+#include <unordered_map>
 
 class DCT {
 private:
-    float cc[4][4]; // preallocate cosine coefficients
+    std::unordered_map<unsigned int, std::vector<float>> cached_cosines;
 
 public:
-
     DCT();
+
+    void build_map(unsigned int blocksize);
 
     std::vector<float> naive_dct_1d(const std::vector<float> &vec);
     std::vector<float> naive_dct_2d(const std::vector<float> &vec);

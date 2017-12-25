@@ -21,13 +21,7 @@
 #include "dct.h"
 
 DCT::DCT() {
-    size_t len = 4;
-    const float factor = M_PI / (float)len;
-    for (size_t i = 0; i < len; i++) {
-        for (size_t j = 0; j < len; j++) {
-            cc[i][j] = std::cos(((float)i + 0.5) * (float)j * factor);
-        }
-    }
+
 }
 
 /**
@@ -204,6 +198,10 @@ std::vector<float> DCT::naive_dct_3d(const std::vector<float> &vec) {
 
     const float factor = M_PI / (float)len;
 
+    // get cache
+    auto got = this->cached_cosines.find(len);
+    std::vector<float> cache = got->second;
+
     // loop over dct periods
     for (size_t i = 0; i < len; i++) {
         for (size_t j = 0; j < len; j++) {
@@ -223,7 +221,7 @@ std::vector<float> DCT::naive_dct_3d(const std::vector<float> &vec) {
                             //        std::cos(((float)o + 0.5) * (float)k * factor);
 
                             // use pre-generated cosines
-                            sum += vec.at(m * (len * len) + n * len + o) * cc[m][i] * cc[n][j] * cc[o][k];
+                            sum += vec.at(m * (len * len) + n * len + o) * cache[m * len + i] * cache[n * len + j] * cache[o * len + k];
                         }
                     }
                 }
@@ -269,6 +267,10 @@ std::vector<float> DCT::inv_dct_3d(const std::vector<float> &vec) {
 
     const float factor = M_PI / (float)len;
 
+    // get cache
+    auto got = this->cached_cosines.find(len);
+    std::vector<float> cache = got->second;
+
     // loop over xyz coordinates
     for (size_t i = 0; i < len; i++) {  // z
         for (size_t j = 0; j < len; j++) {  // y
@@ -290,7 +292,7 @@ std::vector<float> DCT::inv_dct_3d(const std::vector<float> &vec) {
                             //        std::cos(((float)j + 0.5) * (float)n * factor) *
                             //        std::cos(((float)k + 0.5) * (float)o * factor);
 
-                            sum += vec.at(m * (len * len) + n * len + o) * cc[i][m] * cc[j][n] * cc[k][o];
+                            sum += vec.at(m * (len * len) + n * len + o) * cache[i * len + m] * cache[j * len + n] * cache[k * len + o];
                         }
                     }
                 }
@@ -301,4 +303,22 @@ std::vector<float> DCT::inv_dct_3d(const std::vector<float> &vec) {
     }
 
     return result;
+}
+
+void DCT::build_map(unsigned int blocksize) {
+    if(this->cached_cosines.find(blocksize) != this->cached_cosines.end()) {
+        return;
+    }
+
+    std::cout << "Building cache for blocksize " << blocksize << std::endl;
+    const float factor = M_PI / (float)blocksize;
+
+    std::vector<float> cache;
+    for(unsigned int i=0; i<blocksize; i++) {
+        for(unsigned int j=0; j<blocksize; j++) {
+            cache.push_back(std::cos(((float)i + 0.5) * (float)j * factor));
+        }
+    }
+
+    this->cached_cosines.emplace(blocksize, cache);
 }

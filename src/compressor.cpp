@@ -75,6 +75,9 @@ std::vector<float> Compressor::compress_3d(const std::vector<float>& data_3d, si
     // build coefficient vector
     std::vector<float> coeff(coeff_block_size * nrtx * nrty * nrtz, 0.0f);
 
+    // pre-build cache
+    this->dct->build_map(block_size);
+
     #pragma omp parallel for collapse(3) schedule(dynamic)
     for(size_t tz=0 ; tz < nrtz; tz++) {
         for(size_t ty=0 ; ty < nrty; ty++) {
@@ -167,6 +170,10 @@ std::vector<float> Compressor::decompress_3d(const std::vector<float>& coeff, si
         }
     }
 
+    // pre-build cache
+    this->dct->build_map(block_size);
+
+    // construct out vector
     std::vector<float> out(nx * ny * nz, 0.0f);
 
     #pragma omp parallel for collapse(3) schedule(dynamic)
