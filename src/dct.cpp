@@ -21,7 +21,13 @@
 #include "dct.h"
 
 DCT::DCT() {
-
+    size_t len = 4;
+    const float factor = M_PI / (float)len;
+    for (size_t i = 0; i < len; i++) {
+        for (size_t j = 0; j < len; j++) {
+            cc[i][j] = std::cos(((float)i + 0.5) * (float)j * factor);
+        }
+    }
 }
 
 /**
@@ -211,10 +217,13 @@ std::vector<float> DCT::naive_dct_3d(const std::vector<float> &vec) {
                     for (size_t n = 0; n < len; n++) {  // y
                         for (size_t o = 0; o < len; o++) {  // x
 
-                            sum += vec.at(m * (len * len) + n * len + o) *
-                                   std::cos(((float)m + 0.5) * (float)i * factor) *
-                                   std::cos(((float)n + 0.5) * (float)j * factor) *
-                                   std::cos(((float)o + 0.5) * (float)k * factor);
+                            // sum += vec.at(m * (len * len) + n * len + o) *
+                            //        std::cos(((float)m + 0.5) * (float)i * factor) *
+                            //        std::cos(((float)n + 0.5) * (float)j * factor) *
+                            //        std::cos(((float)o + 0.5) * (float)k * factor);
+
+                            // use pre-generated cosines
+                            sum += vec.at(m * (len * len) + n * len + o) * cc[m][i] * cc[n][j] * cc[o][k];
                         }
                     }
                 }
@@ -276,10 +285,12 @@ std::vector<float> DCT::inv_dct_3d(const std::vector<float> &vec) {
                                 continue;
                             }
 
-                            sum += vec.at(m * (len * len) + n * len + o) *
-                                   std::cos(((float)i + 0.5) * (float)m * factor) *
-                                   std::cos(((float)j + 0.5) * (float)n * factor) *
-                                   std::cos(((float)k + 0.5) * (float)o * factor);
+                            // sum += vec.at(m * (len * len) + n * len + o) *
+                            //        std::cos(((float)i + 0.5) * (float)m * factor) *
+                            //        std::cos(((float)j + 0.5) * (float)n * factor) *
+                            //        std::cos(((float)k + 0.5) * (float)o * factor);
+
+                            sum += vec.at(m * (len * len) + n * len + o) * cc[i][m] * cc[j][n] * cc[k][o];
                         }
                     }
                 }

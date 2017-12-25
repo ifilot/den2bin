@@ -61,7 +61,7 @@ set (BOOST_ALL_DYN_LINK OFF)
 find_package(PkgConfig REQUIRED)
 find_package(BZIP2 REQUIRED)
 find_package(GLM REQUIRED)
-find_package(Boost COMPONENTS chrono regex iostreams system filesystem thread REQUIRED)
+find_package(Boost COMPONENTS regex iostreams filesystem REQUIRED)
 pkg_check_modules(TCLAP tclap REQUIRED)
 
 # Set include folders
@@ -75,7 +75,7 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 add_executable(den2bin ${SOURCES})
 
 # Set C++14
-add_definitions(-std=c++14)
+add_definitions(-std=c++17 -march=native)
 
 # Link libraries
 if(UNIX AND NOT APPLE)
@@ -88,9 +88,6 @@ if(APPLE)
 else()
     target_link_libraries(den2bin ${Boost_LIBRARIES} ${BZIP2_LIBRARY})
 endif()
-
-# add Boost definition
-add_definitions(-DBOOST_LOG_DYN_LINK)
 
 # add Wno-literal-suffix to suppress warning messages
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}")

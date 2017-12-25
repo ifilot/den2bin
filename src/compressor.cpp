@@ -68,10 +68,14 @@ std::vector<float> Compressor::compress_3d(const std::vector<float>& data_3d, si
 
     std::cout << "Building DCT; this might take a while. Target deflation factor: " << (float)coeff_block_size / (float)(block_size * block_size * block_size) << std::endl;
 
+    auto npthreads = omp_get_max_threads();
+    omp_set_num_threads(npthreads);
+    std::cout << "Using " << npthreads << " threads for the DCT." << std::endl;
+
     // build coefficient vector
     std::vector<float> coeff(coeff_block_size * nrtx * nrty * nrtz, 0.0f);
 
-    #pragma omp parallel for collapse(3)
+    #pragma omp parallel for collapse(3) schedule(dynamic)
     for(size_t tz=0 ; tz < nrtz; tz++) {
         for(size_t ty=0 ; ty < nrty; ty++) {
             for(size_t tx=0 ; tx < nrtx; tx++) {

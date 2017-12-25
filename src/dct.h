@@ -24,10 +24,12 @@
 #include <iostream>
 #include <vector>
 #include <cmath>
+#include <fftw3.h>
+#include <complex>
 
 class DCT {
 private:
-
+    float cc[4][4]; // preallocate cosine coefficients
 
 public:
 

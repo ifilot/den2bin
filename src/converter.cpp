@@ -144,6 +144,7 @@ void Converter::get_info(const std::string& filename) {
 void Converter::build_density(const std::string& filename) {
     // open file
     std::ofstream f(filename);
+    std::stringstream out;
 
     if(this->coeff.size() > 0) {
         std::cout << "Decompressing DCT; this might take a while" << std::endl;
@@ -160,33 +161,33 @@ void Converter::build_density(const std::string& filename) {
         auto start = std::chrono::system_clock::now();
 
         // write message
-        f << "CHGCAR" << std::endl;
+        out << "CHGCAR" << std::endl;
 
         // write scalar
-        f << boost::format("    %10.6f") % 1.0 << std::endl;
+        out << boost::format("    %10.6f") % 1.0 << std::endl;
 
         // write matrix
-        f << boost::format("  %10.6f  %12.6f  %12.6f") % mat[0][0] % mat[0][1] % mat[0][2] << std::endl;
-        f << boost::format("  %10.6f  %12.6f  %12.6f") % mat[1][0] % mat[1][1] % mat[1][2] << std::endl;
-        f << boost::format("  %10.6f  %12.6f  %12.6f") % mat[2][0] % mat[2][1] % mat[2][2] << std::endl;
+        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[0][0] % mat[0][1] % mat[0][2] << std::endl;
+        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[1][0] % mat[1][1] % mat[1][2] << std::endl;
+        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[2][0] % mat[2][1] % mat[2][2] << std::endl;
 
         // write atoms
-        f << boost::format("    %i") % 0 << std::endl;
-        f<< "Direct" << std::endl << std::endl;
+        out << boost::format("    %i") % 0 << std::endl;
+        out << "Direct" << std::endl << std::endl;
 
-        f << boost::format("  %i  %i  %i") % griddim[0] % griddim[1] % griddim[2] << std::endl;
+        out << boost::format("  %i  %i  %i") % griddim[0] % griddim[1] % griddim[2] << std::endl;
 
         size_t gridsz = griddim[0] * griddim[1] * griddim[2];
         float volume = glm::dot(glm::cross(this->mat[0], this->mat[1]), this->mat[2]);
 
         for(size_t i=0; i<gridsz; i++) {
 
-            f << boost::format("% 11.10E") % (this->data[i] * volume);
+            out << boost::format("% 11.10E") % (this->data[i] * volume);
 
             if((i+1) % 5 == 0) {
-                f << std::endl;
+                out << std::endl;
             } else {
-                f << " ";
+                out << " ";
             }
         }
 
@@ -194,6 +195,9 @@ void Converter::build_density(const std::string& filename) {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "Wrote file in " << elapsed_seconds.count() << " seconds." << std::endl;
     }
+
+    // write to file
+    f << out.str();
 
     // close file
     f.close();

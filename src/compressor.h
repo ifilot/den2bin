@@ -23,6 +23,7 @@
 
 #include <memory>
 #include <fstream>
+#include <omp.h>
 
 #include "dct.h"
 
