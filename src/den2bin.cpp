@@ -68,7 +68,7 @@ int main(int argc, char* argv[]) {
         bool flag_extract = arg_extract.getValue();
 
         std::cout << "-----------------------------------------" << std::endl;
-        std::cout << "Executing DEN2BIN v.1.1.0" << std::endl;
+        std::cout << "Executing DEN2BIN v.1.1.1" << std::endl;
         std::cout << "Author: Ivo Filot <i.a.w.filot@tue.nl>" << std::endl;
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << std::endl;

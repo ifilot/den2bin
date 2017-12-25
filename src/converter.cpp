@@ -161,31 +161,33 @@ void Converter::build_density(const std::string& filename) {
         auto start = std::chrono::system_clock::now();
 
         // write message
-        out << "CHGCAR" << std::endl;
+        out << "CHGCAR" << "\n";
 
         // write scalar
-        out << boost::format("    %10.6f") % 1.0 << std::endl;
+        out << boost::format("    %10.6f") % 1.0 << "\n";
 
         // write matrix
-        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[0][0] % mat[0][1] % mat[0][2] << std::endl;
-        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[1][0] % mat[1][1] % mat[1][2] << std::endl;
-        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[2][0] % mat[2][1] % mat[2][2] << std::endl;
+        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[0][0] % mat[0][1] % mat[0][2] << "\n";
+        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[1][0] % mat[1][1] % mat[1][2] << "\n";
+        out << boost::format("  %10.6f  %12.6f  %12.6f") % mat[2][0] % mat[2][1] % mat[2][2] << "\n";
 
         // write atoms
-        out << boost::format("    %i") % 0 << std::endl;
-        out << "Direct" << std::endl << std::endl;
+        out << boost::format("    %i") % 0 << "\n";
+        out << "Direct" << "\n" << "\n";
 
-        out << boost::format("  %i  %i  %i") % griddim[0] % griddim[1] % griddim[2] << std::endl;
+        out << boost::format("  %i  %i  %i") % griddim[0] % griddim[1] % griddim[2] << "\n";
 
         size_t gridsz = griddim[0] * griddim[1] * griddim[2];
         float volume = glm::dot(glm::cross(this->mat[0], this->mat[1]), this->mat[2]);
 
+        char buffer[50];
         for(size_t i=0; i<gridsz; i++) {
 
-            out << boost::format("% 11.10E") % (this->data[i] * volume);
+            sprintf(buffer, "% 11.10E", this->data[i] * volume);
+            out << buffer;
 
             if((i+1) % 5 == 0) {
-                out << std::endl;
+                out << "\n";
             } else {
                 out << " ";
             }
@@ -193,7 +195,7 @@ void Converter::build_density(const std::string& filename) {
 
         auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "Wrote file in " << elapsed_seconds.count() << " seconds." << std::endl;
+        std::cout << "Wrote file in " << elapsed_seconds.count() << " seconds." << "\n";
     }
 
     // write to file
