@@ -60,12 +60,14 @@ set (BOOST_ALL_DYN_LINK OFF)
 # Include libraries
 find_package(PkgConfig REQUIRED)
 find_package(BZIP2 REQUIRED)
+find_package(GLM REQUIRED)
 find_package(Boost COMPONENTS chrono regex iostreams system filesystem thread REQUIRED)
 pkg_check_modules(TCLAP tclap REQUIRED)
 
 # Set include folders
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}
                     ${CMAKE_BINARY_DIR}
+                    ${GLM_INCLUDE_DIRS}
                     ${Boost_INCLUDE_DIRS})
 
 # Add sources
