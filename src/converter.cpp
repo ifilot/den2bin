@@ -57,7 +57,7 @@ void Converter::get_info(const std::string& filename) {
         msg[msg_size] = '\0';       // write end of string character
         std::string msgstr(msg);    // parse char array to std::string
         std::cout << "File comments: " << msgstr << std::endl;
-        delete msg;                 // we no longer need the memory
+        delete[] msg;                 // we no longer need the memory
 
         // read header size
         decompressed.read(buffer, sizeof(uint32_t));
@@ -69,7 +69,7 @@ void Converter::get_info(const std::string& filename) {
         header[header_size] = '\0';       // write end of string character
         std::string headerstr(header);    // parse char array to std::string
         std::cout << "File header: " << headerstr << std::endl;
-        delete msg;                       // we no longer need the memory
+        delete[] msg;                       // we no longer need the memory
 
         // read the dimensions of the unit cell
         for(unsigned int i=0; i<3; i++) {
@@ -128,7 +128,7 @@ void Converter::get_info(const std::string& filename) {
             std::cout << "Maximum value: " << max << std::endl;
         }
 
-        delete buffer;  // clean up the mess :-)
+        delete[] buffer;  // clean up the mess :-)
 
     } else {
         std::cerr << "Cannot read file " << filename << std::endl;

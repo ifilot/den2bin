@@ -36,8 +36,8 @@ endif()
 # add OS specific
 if(APPLE)
     add_definitions(-D_APPLE)
-    SET(BOOST_INCLUDEDIR "/opt/local/include")
-    SET(BOOST_LIBRARYDIR "/opt/local/lib")
+    SET(BOOST_INCLUDEDIR "/usr/local/include")
+    SET(BOOST_LIBRARYDIR "/usr/local/lib")
 else()
     SET(BOOST_INCLUDEDIR "/usr/include")
     SET(BOOST_LIBRARYDIR "/usr/lib/x86_64-linux-gnu")
@@ -59,7 +59,7 @@ set (BOOST_ALL_DYN_LINK OFF)
 
 # Include libraries
 find_package(PkgConfig REQUIRED)
-find_package(BZip2 REQUIRED)
+find_package(BZIP2 REQUIRED)
 find_package(Boost COMPONENTS chrono regex iostreams system filesystem thread REQUIRED)
 pkg_check_modules(TCLAP tclap REQUIRED)
 
@@ -82,10 +82,9 @@ endif()
 if(APPLE)
     SET(CMAKE_MACOSX_RPATH TRUE)
     SET_TARGET_PROPERTIES(den2bin PROPERTIES INSTALL_RPATH "@executable_path/lib")
-    SET(CMAKE_EXE_LINKER_FLAGS "-L${GLEW_LIBRARY_DIRS}")
-    target_link_libraries(den2bin ${Boost_LIBRARIES})
+    target_link_libraries(den2bin ${Boost_LIBRARIES} ${BZIP2_LIBRARY})
 else()
-    target_link_libraries(den2bin ${Boost_LIBRARIES} ${BZIP2_LIBRARIES})
+    target_link_libraries(den2bin ${Boost_LIBRARIES} ${BZIP2_LIBRARY})
 endif()
 
 # add Boost definition
