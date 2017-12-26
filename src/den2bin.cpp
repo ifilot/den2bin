@@ -118,10 +118,11 @@ int main(int argc, char* argv[]) {
             if(flag_write_raw) {
                 cv.write_to_binary_raw(den, output_filename);
             } else if(flag_write_lossy) {
-                cv.write_to_binary_lossy(message, den, output_filename, blocksize, quality);
+                cv.write_to_binary_dct(message, den, output_filename, blocksize, quality);
             }else {
                 cv.write_to_binary(message, den, output_filename);
             }
+
             end = std::chrono::system_clock::now();
             elapsed_seconds = end-start;
             std::cout << "Constructed " << output_filename << " in " << elapsed_seconds.count() << " seconds." << std::endl;

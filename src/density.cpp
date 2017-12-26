@@ -57,6 +57,24 @@ float Density::read(unsigned int lines) {
 }
 
 /**
+ * @brief      get minimum value in the density
+ *
+ * @return     minimum value
+ */
+float Density::minval() const {
+    return *std::min_element(this->gridptr.begin(), this->gridptr.end());
+}
+
+/**
+ * @brief      get maximum value in the density
+ *
+ * @return     maximum value
+ */
+float Density::maxval() const {
+    return *std::max_element(this->gridptr.begin(), this->gridptr.end());
+}
+
+/**
  * @brief      assert whether input is vasp 5 format
  */
 void Density::test_vasp5() {
@@ -66,7 +84,7 @@ void Density::test_vasp5() {
         std::getline(infile, line);
     }
     std::getline(infile, line);
-    
+
     // check if this line contains atomic information (i.e. alpha-characters)
     boost::regex regex_vasp_version("^(.*[A-Za-z]+.*)$");
     boost::smatch what;

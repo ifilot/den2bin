@@ -50,6 +50,9 @@ private:
     unsigned int griddim[3];
     glm::mat3 mat;
 
+    float minval;       //!< minimum value in dataset
+    float maxval;       //!< maximum value in dataset
+
 public:
     /**
      * @brief      default constructor for Converter object
@@ -82,7 +85,7 @@ public:
      *
      * @return     filesize
      */
-    void write_to_binary_lossy(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize);
+    void write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize);
 
     /**
      * @brief      write density class to binary file (raw)
@@ -100,6 +103,24 @@ public:
      */
     void build_density(const std::string& filename);
 private:
+
+    /**
+     * @brief      normalize data to [-0.5,0.5]
+     *
+     * @param      data  The data
+     * @param[in]  min   minimum value
+     * @param[in]  max   maximum value
+     */
+    void normalize_data(std::vector<float>* data, float min, float max);
+
+    /**
+     * @brief      denormalize data to original range
+     *
+     * @param      data  The data
+     * @param[in]  min   minimum value
+     * @param[in]  max   maximum value
+     */
+    void denormalize_data(std::vector<float>* data, float min, float max);
 };
 
 #endif // _CONVERTER_H

@@ -26,7 +26,7 @@ project (den2bin)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules )
 
 # prepare configuration file
-SET(VERSION "1.2.0")
+SET(VERSION "1.3.0")
 configure_file(config.h.in ../src/config.h @ONLY)
 
 # Enable release build

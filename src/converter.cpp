@@ -99,7 +99,17 @@ void Converter::get_info(const std::string& filename) {
             decompressed.read(buffer, sizeof(uint32_t));
             const uint32_t coeff_size = *(uint32_t *)buffer;
 
+            // obtain min value
+            decompressed.read(buffer, sizeof(float));
+            this->minval = *(float *)buffer;
+
+            // obtain max value
+            decompressed.read(buffer, sizeof(float));
+            this->maxval = *(float *)buffer;
+
             std::cout << "Data contains " << coeff_size << " DCT coefficients." << std::endl;
+            std::cout << "Minimum value: " << this->minval << std::endl;
+            std::cout << "Maximum value: " << this->maxval << std::endl;
 
             this->coeff.clear();
             this->data.clear();
@@ -108,6 +118,9 @@ void Converter::get_info(const std::string& filename) {
                 const float val = *(float *)buffer;
                 this->coeff.push_back(val);
             }
+
+            // de-normalize data
+            this->denormalize_data(&this->data, this->minval, this->maxval);
         }
 
         if(headerstr.substr(0,3).compare("BIN") == 0) {
@@ -154,6 +167,9 @@ void Converter::build_density(const std::string& filename) {
         auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "Decompressed DCT in " << elapsed_seconds.count() << " seconds." << std::endl;
+
+        // de-normalize data
+        this->denormalize_data(&this->data, this->minval, this->maxval);
     }
 
     if(this->data.size() > 0) {
@@ -300,7 +316,7 @@ void Converter::write_to_binary(const std::string& comments, const Density& dens
  *
  * @return     filesize
  */
-void Converter::write_to_binary_lossy(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize) {
+void Converter::write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize) {
     std::fstream f(outputfile, std::ios_base::binary | std::ios::out);
 
     if(f.good()) {
@@ -336,13 +352,25 @@ void Converter::write_to_binary_lossy(const std::string& comments, const Density
             origin.write((char*)&val, sizeof(uint32_t));
         }
 
+        // normalize data
+        this->minval = density.minval();
+        this->maxval = density.maxval();
+        auto data = density.get_grid_vec();
+        this->normalize_data(&data, this->minval, this->maxval);
+
         // write the DCT coefficients
         Compressor compressor;
-        auto coeff = compressor.compress_3d(density.get_grid_vec(), this->griddim[0], this->griddim[1], this->griddim[2], blocksize, coeffsize);
+        auto coeff = compressor.compress_3d(data, this->griddim[0], this->griddim[1], this->griddim[2], blocksize, coeffsize);
 
         // write coefficients size
         const uint32_t coeff_length = coeff.size();
         origin.write((char*)&coeff_length, sizeof(uint32_t));
+
+        // write min value
+        origin.write((char*)&this->minval, sizeof(float));
+
+        // write max value
+        origin.write((char*)&this->maxval, sizeof(float));
 
         // write the individual coefficients
         for(unsigned int i=0; i<coeff.size(); i++) {
@@ -394,4 +422,46 @@ void Converter::write_to_binary_raw(const Density& density, const std::string& o
         std::cerr << "Cannot write to file " << outputfile << std::endl;
         throw std::runtime_error("Could not write to file");
     }
+}
+
+/**
+ * @brief      normalize data to [-0.5,0.5]
+ *
+ * @param      data  The data
+ * @param[in]  min   minimum value
+ * @param[in]  max   maximum value
+ */
+void Converter::normalize_data(std::vector<float>* data, float min, float max) {
+    auto start = std::chrono::system_clock::now();
+    const float range = max - min;
+
+    #pragma omp parallel for
+    for(unsigned int i=0; i<data->size(); i++) {
+        data->at(i) = (data->at(i) - min) / range - 0.5f;
+    }
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::cout << "Normalized data in " << elapsed_seconds.count() << " seconds." << std::endl;
+}
+
+/**
+ * @brief      denormalize data to original range
+ *
+ * @param      data  The data
+ * @param[in]  min   minimum value
+ * @param[in]  max   maximum value
+ */
+void Converter::denormalize_data(std::vector<float>* data, float min, float max) {
+    auto start = std::chrono::system_clock::now();
+    const float range = max - min;
+
+    #pragma omp parallel for
+    for(unsigned int i=0; i<data->size(); i++) {
+        data->at(i) = (data->at(i) + 0.5f) * range + min;
+    }
+
+    auto end = std::chrono::system_clock::now();
+    std::chrono::duration<double> elapsed_seconds = end-start;
+    std::cout << "Normalized data in " << elapsed_seconds.count() << " seconds." << std::endl;
 }

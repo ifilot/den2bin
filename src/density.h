@@ -86,8 +86,6 @@ public:
         return out;
     }
 
-public:
-
     /**
      * @brief      read number of lines
      *
@@ -96,6 +94,20 @@ public:
      * @return     percentage of file read
      */
     float read(unsigned int lines);
+
+    /**
+     * @brief      get minimum value in the density
+     *
+     * @return     minimum value
+     */
+    float minval() const;
+
+    /**
+     * @brief      get maximum value in the density
+     *
+     * @return     maximum value
+     */
+    float maxval() const;
 
 private:
 
