@@ -221,7 +221,7 @@ std::vector<float> DCT::naive_dct_3d(const std::vector<float> &vec) {
                             //        std::cos(((float)o + 0.5) * (float)k * factor);
 
                             // use pre-generated cosines
-                            sum += vec.at(m * (len * len) + n * len + o) * cache[m * len + i] * cache[n * len + j] * cache[o * len + k];
+                            sum += vec[m * (len * len) + n * len + o] * cache[m * len + i] * cache[n * len + j] * cache[o * len + k];
                         }
                     }
                 }
@@ -292,7 +292,7 @@ std::vector<float> DCT::inv_dct_3d(const std::vector<float> &vec) {
                             //        std::cos(((float)j + 0.5) * (float)n * factor) *
                             //        std::cos(((float)k + 0.5) * (float)o * factor);
 
-                            sum += vec.at(m * (len * len) + n * len + o) * cache[i * len + m] * cache[j * len + n] * cache[k * len + o];
+                            sum += vec[m * (len * len) + n * len + o] * cache[i * len + m] * cache[j * len + n] * cache[k * len + o];
                         }
                     }
                 }

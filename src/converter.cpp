@@ -180,17 +180,37 @@ void Converter::build_density(const std::string& filename) {
         size_t gridsz = griddim[0] * griddim[1] * griddim[2];
         float volume = glm::dot(glm::cross(this->mat[0], this->mat[1]), this->mat[2]);
 
-        char buffer[50];
-        for(size_t i=0; i<gridsz; i++) {
+        size_t nrthreads = omp_get_max_threads();
+        std::stringstream local[nrthreads];
 
-            sprintf(buffer, "% 11.10E", this->data[i] * volume);
-            out << buffer;
+        #pragma omp parallel
+        {
+            size_t threadnum = omp_get_thread_num();
 
-            if((i+1) % 5 == 0) {
-                out << "\n";
-            } else {
-                out << " ";
+            size_t start = gridsz / nrthreads * threadnum;
+            size_t stop = gridsz / nrthreads * (threadnum + 1);
+
+            stop = std::min(gridsz, stop);
+
+            char buffer[50];
+
+            #pragma omp parallel for
+            for(size_t i=start; i<stop; i++) {
+
+                sprintf(buffer, "% 11.10E", this->data[i] * volume);
+                local[threadnum] << buffer;
+
+                if((i+1) % 5 == 0) {
+                    local[threadnum] << "\n";
+                } else {
+                    local[threadnum] << " ";
+                }
             }
+        }
+
+        // merge results
+        for(unsigned int i=0; i<nrthreads; i++) {
+            out << local[i].str();
         }
 
         auto end = std::chrono::system_clock::now();
