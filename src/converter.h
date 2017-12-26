@@ -34,6 +34,7 @@
 
 #include "density.h"
 #include "compressor.h"
+#include "config.h"
 
 /**
  * @brief      converter class that outputs density to binary file

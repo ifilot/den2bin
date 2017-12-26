@@ -24,11 +24,12 @@
 
 #include "density.h"
 #include "converter.h"
+#include "config.h"
 
 int main(int argc, char* argv[]) {
 
     try {
-        TCLAP::CmdLine cmd("Converts VASP density file (CHGCAR/LOCPOT/etc.) to a highly compressed binary", ' ', "1.1.3");
+        TCLAP::CmdLine cmd("Converts VASP density file (CHGCAR/LOCPOT/etc.) to a highly compressed binary", ' ', PROGRAM_VERSION);
 
         //**************************************
         // declare values to be parsed
@@ -78,7 +79,7 @@ int main(int argc, char* argv[]) {
         unsigned int quality = arg_quality.getValue();
 
         std::cout << "-----------------------------------------" << std::endl;
-        std::cout << "Executing DEN2BIN v.1.1.3" << std::endl;
+        std::cout << "Executing DEN2BIN v." << PROGRAM_VERSION << std::endl;
         std::cout << "Author: Ivo Filot <i.a.w.filot@tue.nl>" << std::endl;
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << std::endl;

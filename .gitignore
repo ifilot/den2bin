@@ -62,3 +62,4 @@ ipch/
 *.dat
 
 build/*
+src/config.h

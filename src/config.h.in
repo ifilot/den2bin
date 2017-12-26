@@ -1,0 +1,8 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H
+
+#cmakedefine VERSION "@VERSION@"
+
+static const std::string PROGRAM_VERSION(VERSION);
+
+#endif // _CONFIG_H

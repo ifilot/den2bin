@@ -64,12 +64,12 @@ void Converter::get_info(const std::string& filename) {
         const uint32_t header_size = *(uint32_t *)buffer;
 
         // read and output header message
-        char* header = new char[header_size+1];
+        char* header = new char[header_size+10];
         decompressed.read(header, header_size);
         header[header_size] = '\0';       // write end of string character
         std::string headerstr(header);    // parse char array to std::string
         std::cout << "File header: " << headerstr << std::endl;
-        delete[] msg;                       // we no longer need the memory
+        delete[] header;               // we no longer need the memory
 
         // read the dimensions of the unit cell
         for(unsigned int i=0; i<3; i++) {
@@ -248,7 +248,7 @@ void Converter::write_to_binary(const std::string& comments, const Density& dens
         origin.write((char*)&comments.c_str()[0], sizeof(char) * comments_length);
 
         // construct header
-        std::string header = "BIN|BZIP2";
+        const std::string header = "BIN|BZIP2|" + PROGRAM_VERSION;
 
         // store header with file information
         const uint32_t header_length = header.size();
@@ -314,7 +314,7 @@ void Converter::write_to_binary_lossy(const std::string& comments, const Density
         origin.write((char*)&comments.c_str()[0], sizeof(char) * comments_length);
 
         // construct header
-        std::string header = (boost::format("DCT %04i %04i|BZIP2") % blocksize % coeffsize).str();
+        const std::string header = (boost::format("DCT %04i %04i|BZIP2|%s") % blocksize % coeffsize % PROGRAM_VERSION).str();
 
         // store header with file information
         const uint32_t header_length = header.size();

@@ -25,6 +25,10 @@ project (den2bin)
 # add custom directory to look for .cmake files
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/modules )
 
+# prepare configuration file
+SET(VERSION "1.2.0")
+configure_file(config.h.in ../src/config.h @ONLY)
+
 # Enable release build
 if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to 'Release' as none was specified.")
