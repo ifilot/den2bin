@@ -21,6 +21,24 @@ make -j5
 
 ## Usage
 
+### Lossy compression
+```
+# to pack (note the "-l")
+./den2bin -i <DENSITY_FILENAME> -o <BINARY_FILENAME> -m <MESSAGE_HEADER> -l -b <BLOCKSIZE> -q <QUALITY>
+
+# to unpack (same as for the lossless version)
+./den2bin -x -i <BINARY_FILENAME> -o <DENSITY_FILENAME>
+```
+
+Example:
+```
+# to pack (note the "-l")
+./den2bin -i CHGCAR -o chgcar.dct -m "My special CHGCAR file" -l -b 4 -q 2
+
+# to unpack (same as for the lossless version)
+./den2bin -i chgcar.dct -o CHGCAR -x
+```
+
 ### Lossless compression
 ```
 # to pack
@@ -39,25 +57,7 @@ Example:
 ./den2bin -i chgcar.bin -o CHGCAR -x
 ```
 
-### Lossy compression
-```
-# to pack (note the "-l")
-./den2bin -i <DENSITY_FILENAME> -o <BINARY_FILENAME> -m <MESSAGE_HEADER> -l
-
-# to unpack (same as for the lossless version)
-./den2bin -x -i <BINARY_FILENAME> -o <DENSITY_FILENAME>
-```
-
-Example:
-```
-# to pack (note the "-l")
-./den2bin -i CHGCAR -o chgcar.dct -m "My special CHGCAR file" -l
-
-# to unpack (same as for the lossless version)
-./den2bin -i chgcar.dct -o CHGCAR -x
-```
-
 ## Performance
 For the lossless compression, the final binary file has a compression ratio of 10-12. For example, a 300 MB file will be reduced to less than 30 MB. The compression is done in less than 5 seconds.
 
-For lossy compression, the compression ratio can be as large as 75. For example, a 500 MB file will be reduced to less than 7 MB. Compression times are quite lengthy though, on a i7-4790K, it takes about half a minute using 8 threads.
+For lossy compression, the compression ratio can be as large as 250. For example, a 500 MB file will be reduced to about 2 MB. Compression times are typically between 1-10 seconds (tested on a i7-4790K using 8 threads).
