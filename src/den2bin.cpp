@@ -116,10 +116,13 @@ int main(int argc, char* argv[]) {
             std::cout << "Read " << input_filename << " in " << elapsed_seconds.count() << " seconds." << std::endl;
 
             if(flag_write_raw) {
+                std::cout << "Creating raw binary file" << std::endl;
                 cv.write_to_binary_raw(den, output_filename);
             } else if(flag_write_lossy) {
+                std::cout << "Creating dct-compressed binary file" << std::endl;
                 cv.write_to_binary_dct(message, den, output_filename, blocksize, quality);
             }else {
+                std::cout << "Creating lossless binary file" << std::endl;
                 cv.write_to_binary(message, den, output_filename);
             }
 

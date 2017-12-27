@@ -336,8 +336,8 @@ void Converter::write_to_binary(const std::string& comments, const Density& dens
  * @param[in]  comments    comments to store
  * @param[in]  density     density object
  * @param[in]  outputfile  output path
- *
- * @return     filesize
+ * @param[in]  blocksize   The blocksize
+ * @param[in]  coeffsize   The coeffsize
  */
 void Converter::write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize) {
     std::fstream f(outputfile, std::ios_base::binary | std::ios::out);
@@ -384,6 +384,10 @@ void Converter::write_to_binary_dct(const std::string& comments, const Density& 
         // write the DCT coefficients
         Compressor compressor;
         auto coeff = compressor.compress_3d(data, this->griddim[0], this->griddim[1], this->griddim[2], blocksize, coeffsize);
+
+        // check compression results
+        float diff = this->calculate_difference(density.get_grid_vec(), coeff, blocksize, coeffsize);
+        std::cout << "Average data loss: "<< diff << " per gridpoint." << std::endl;
 
         // write coefficients size
         const uint32_t coeff_length = coeff.size();
@@ -487,4 +491,29 @@ void Converter::denormalize_data(std::vector<float>* data, float min, float max)
     auto end = std::chrono::system_clock::now();
     std::chrono::duration<double> elapsed_seconds = end-start;
     std::cout << "Normalized data in " << elapsed_seconds.count() << " seconds." << std::endl;
+}
+
+/**
+ * @brief      calculate difference between the dct coefficient and the data
+ *
+ * @param[in]  orig       original data
+ * @param[in]  coeff      dct coefficients
+ * @param[in]  blocksize  The blocksize
+ * @param[in]  coeffsize  The coeffsize
+ *
+ * @return     the difference
+ */
+float Converter::calculate_difference(const std::vector<float>& orig, const std::vector<float>& coeff, size_t blocksize, size_t coeffsize) {
+    Compressor compressor;
+    auto decompressed = compressor.decompress_3d(coeff, this->griddim[0], this->griddim[1], this->griddim[2], blocksize, coeffsize);
+    this->denormalize_data(&decompressed, this->minval, this->maxval);
+
+    float diff = 0.0;
+
+    #pragma omp parallel reduction(+:diff)
+    for(size_t i=0; i<decompressed.size(); i++) {
+        diff += std::abs(orig[i] - decompressed[i]);
+    }
+
+    return diff / (float)(this->griddim[0] * this->griddim[1] * this->griddim[2]);
 }

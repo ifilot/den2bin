@@ -77,13 +77,14 @@ public:
     void write_to_binary(const std::string& comments, const Density& sf, const std::string& outputfile);
 
     /**
-     * @brief      write density class to binary file in a lossy format (using DCT)
+     * @brief      write density class to binary file in a lossy format (using
+     *             DCT)
      *
      * @param[in]  comments    comments to store
      * @param[in]  density     density object
      * @param[in]  outputfile  output path
-     *
-     * @return     filesize
+     * @param[in]  blocksize   The blocksize
+     * @param[in]  coeffsize   The coeffsize
      */
     void write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize);
 
@@ -121,6 +122,18 @@ private:
      * @param[in]  max   maximum value
      */
     void denormalize_data(std::vector<float>* data, float min, float max);
+
+    /**
+     * @brief      calculate difference between the dct coefficient and the data
+     *
+     * @param[in]  orig       original data
+     * @param[in]  coeff      dct coefficients
+     * @param[in]  blocksize  The blocksize
+     * @param[in]  coeffsize  The coeffsize
+     *
+     * @return     the difference
+     */
+    float calculate_difference(const std::vector<float>& orig, const std::vector<float>& coeff, size_t blocksize, size_t coeffsize);
 };
 
 #endif // _CONVERTER_H

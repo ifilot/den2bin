@@ -310,7 +310,6 @@ void DCT::build_map(unsigned int blocksize) {
         return;
     }
 
-    std::cout << "Building cache for blocksize " << blocksize << std::endl;
     const float factor = M_PI / (float)blocksize;
 
     std::vector<float> cache;
