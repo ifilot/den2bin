@@ -80,8 +80,7 @@ std::vector<float> Compressor::compress_3d(const std::vector<float>& data_3d, si
     this->dct->build_map(block_size);
 
     // progress bar
-    const size_t expected_counts = nrtx * nrty * nrtz;
-    ProgressBar progress_bar(expected_counts);
+    ProgressBar progress_bar(nrtz);
     std::mutex lock;
 
     #pragma omp parallel for collapse(3) schedule(dynamic)
@@ -129,9 +128,11 @@ std::vector<float> Compressor::compress_3d(const std::vector<float>& data_3d, si
                 }
 
                 // update progress bar
-                while(!lock.try_lock()) {}
-                ++progress_bar;
-                lock.unlock();
+                if(tx == 0 && ty == 0) {
+                    while(!lock.try_lock()) {}
+                    ++progress_bar;
+                    lock.unlock();
+                }
             }
         }
     }
@@ -197,8 +198,7 @@ std::vector<float> Compressor::decompress_3d(const std::vector<float>& coeff, si
     std::cout << "Decompressing (performing inverse discrete cosine transformation):" << std::endl;
 
     // progress bar
-    const size_t expected_counts = nrtx * nrty * nrtz;
-    ProgressBar progress_bar(expected_counts);
+    ProgressBar progress_bar(nrtz);
     std::mutex lock;
 
     #pragma omp parallel for collapse(3) schedule(dynamic)
@@ -244,9 +244,11 @@ std::vector<float> Compressor::decompress_3d(const std::vector<float>& coeff, si
                 }
 
                 // update progress bar
-                while(!lock.try_lock()) {}
-                ++progress_bar;
-                lock.unlock();
+                if(tx == 0 && ty == 0) {
+                    while(!lock.try_lock()) {}
+                    ++progress_bar;
+                    lock.unlock();
+                }
             }
         }
     }
