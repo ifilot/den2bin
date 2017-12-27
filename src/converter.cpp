@@ -197,7 +197,6 @@ void Converter::build_density(const std::string& filename) {
 
     if(this->data.size() > 0) {
         std::cout << "Writing data to " << filename << std::endl;
-        auto start = std::chrono::system_clock::now();
 
         // write message
         out << "CHGCAR" << "\n";
@@ -220,20 +219,30 @@ void Converter::build_density(const std::string& filename) {
         float volume = glm::dot(glm::cross(this->mat[0], this->mat[1]), this->mat[2]);
 
         size_t nrthreads = omp_get_max_threads();
+        omp_set_num_threads(nrthreads); // always allocate max threads
         std::stringstream local[nrthreads];
+
+        // progress bar
+        ProgressBar progress_bar(gridsz / nrthreads / 1000 - 1);
 
         #pragma omp parallel
         {
             size_t threadnum = omp_get_thread_num();
 
+            // calculate size
+            size_t data = gridsz / nrthreads;
+            size_t rem = gridsz % nrthreads;
+
+            // divide task
             size_t start = gridsz / nrthreads * threadnum;
             size_t stop = gridsz / nrthreads * (threadnum + 1);
-
-            stop = std::min(gridsz, stop);
+            if(threadnum == nrthreads - 1) {
+                stop += rem;
+            }
 
             char buffer[50];
+            unsigned int cnt = 0;
 
-            #pragma omp parallel for
             for(size_t i=start; i<stop; i++) {
 
                 sprintf(buffer, "% 11.10E", this->data[i] * volume);
@@ -244,17 +253,28 @@ void Converter::build_density(const std::string& filename) {
                 } else {
                     local[threadnum] << " ";
                 }
+
+                if(threadnum == 0) {
+                    if(cnt == 1000) {
+                        ++progress_bar;
+                        cnt = 0;
+                    }
+                    cnt++;
+                }
             }
         }
 
+        // add additional newline for the progress bar
+        std::cout << std::endl;
+
         // merge results
+        auto start = std::chrono::system_clock::now();
         for(unsigned int i=0; i<nrthreads; i++) {
             out << local[i].str();
         }
-
         auto end = std::chrono::system_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "Wrote file in " << elapsed_seconds.count() << " seconds." << "\n";
+        std::cout << "Wrote file in " << elapsed_seconds.count() << " seconds." << std::endl;
     }
 
     // write to file
@@ -339,7 +359,7 @@ void Converter::write_to_binary(const std::string& comments, const Density& dens
  * @param[in]  blocksize   The blocksize
  * @param[in]  coeffsize   The coeffsize
  */
-void Converter::write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize) {
+void Converter::write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize, bool check) {
     std::fstream f(outputfile, std::ios_base::binary | std::ios::out);
 
     if(f.good()) {
@@ -385,9 +405,11 @@ void Converter::write_to_binary_dct(const std::string& comments, const Density& 
         Compressor compressor;
         auto coeff = compressor.compress_3d(data, this->griddim[0], this->griddim[1], this->griddim[2], blocksize, coeffsize);
 
-        // check compression results
-        float diff = this->calculate_difference(density.get_grid_vec(), coeff, blocksize, coeffsize);
-        std::cout << "Average data loss: "<< diff << " per gridpoint." << std::endl;
+        if(check) {
+            // check compression results
+            float diff = this->calculate_difference(density.get_grid_vec(), coeff, blocksize, coeffsize);
+            std::cout << "Average data loss: "<< diff << " per gridpoint." << std::endl;
+        }
 
         // write coefficients size
         const uint32_t coeff_length = coeff.size();

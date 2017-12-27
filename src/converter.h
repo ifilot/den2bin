@@ -86,7 +86,7 @@ public:
      * @param[in]  blocksize   The blocksize
      * @param[in]  coeffsize   The coeffsize
      */
-    void write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize);
+    void write_to_binary_dct(const std::string& comments, const Density& density, const std::string& outputfile, size_t blocksize, size_t coeffsize, bool check = false);
 
     /**
      * @brief      write density class to binary file (raw)

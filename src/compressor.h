@@ -24,6 +24,9 @@
 #include <memory>
 #include <fstream>
 #include <omp.h>
+#include <mutex>
+
+#include <progress_bar.h>
 
 #include "dct.h"
 

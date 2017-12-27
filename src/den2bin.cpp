@@ -63,6 +63,10 @@ int main(int argc, char* argv[]) {
         TCLAP::ValueArg<unsigned int> arg_quality("q","quality","Quality",false,2,"quality");
         cmd.add(arg_quality);
 
+        // whether to check data loss
+        TCLAP::SwitchArg arg_check("c","check","Check",false);
+        cmd.add(arg_check);
+
         // whether to extract data in lossy format
         TCLAP::SwitchArg arg_extract("x","extract","Extract",false);
         cmd.add(arg_extract);
@@ -75,6 +79,7 @@ int main(int argc, char* argv[]) {
         bool flag_write_raw = arg_raw.getValue();
         bool flag_write_lossy = arg_lossy.getValue();
         bool flag_extract = arg_extract.getValue();
+        bool flag_check = arg_check.getValue();
         unsigned int blocksize = arg_block_size.getValue();
         unsigned int quality = arg_quality.getValue();
 
@@ -120,7 +125,7 @@ int main(int argc, char* argv[]) {
                 cv.write_to_binary_raw(den, output_filename);
             } else if(flag_write_lossy) {
                 std::cout << "Creating dct-compressed binary file" << std::endl;
-                cv.write_to_binary_dct(message, den, output_filename, blocksize, quality);
+                cv.write_to_binary_dct(message, den, output_filename, blocksize, quality, flag_check);
             }else {
                 std::cout << "Creating lossless binary file" << std::endl;
                 cv.write_to_binary(message, den, output_filename);
@@ -155,7 +160,6 @@ int main(int argc, char* argv[]) {
                 std::cout << "Verification of results in " << elapsed_seconds.count() << " seconds." << std::endl;
             }
         }
-
 
         std::cout << "-----------------------------------------" << std::endl;
         std::cout << "Done" << std::endl << std::endl;
