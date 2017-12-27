@@ -71,6 +71,29 @@ void Converter::get_info(const std::string& filename) {
         std::cout << "File header: " << headerstr << std::endl;
         delete[] header;               // we no longer need the memory
 
+        // analyse header string
+        std::vector<std::string> pieces;
+        boost::split(pieces, headerstr, boost::is_any_of("|"), boost::token_compress_on);
+        std::string versionstr = pieces[2];
+        boost::split(pieces, versionstr, boost::is_any_of("."), boost::token_compress_on);
+        unsigned int version_major = boost::lexical_cast<unsigned int>(pieces[0]);
+        unsigned int version_minor = boost::lexical_cast<unsigned int>(pieces[1]);
+        unsigned int version_micro = boost::lexical_cast<unsigned int>(pieces[2]);
+
+        // check that version is sufficient
+        if(version_major < PROGRAM_VERSION_MAJOR) {
+            std::cerr << "You are using an outdated version DEN2BIN (" << PROGRAM_VERSION << ")" << std::endl;
+            std::cerr << "Please download a more recent version of DEN2BIN. Version encountered: " << versionstr << std::endl;
+        }
+        if(version_major == PROGRAM_VERSION_MAJOR && version_minor < PROGRAM_VERSION_MINOR) {
+            std::cerr << "You are using an outdated version DEN2BIN (" << PROGRAM_VERSION << ")" << std::endl;
+            std::cerr << "Please download a more recent version of DEN2BIN. Version encountered: " << versionstr << std::endl;
+        }
+        if(version_major == PROGRAM_VERSION_MAJOR && version_minor == PROGRAM_VERSION_MINOR && version_micro < PROGRAM_VERSION_MICRO) {
+            std::cerr << "You are using an outdated version DEN2BIN (" << PROGRAM_VERSION << ")" << std::endl;
+            std::cerr << "Please download a more recent version of DEN2BIN. Version encountered: " << versionstr << std::endl;
+        }
+
         // read the dimensions of the unit cell
         for(unsigned int i=0; i<3; i++) {
             for(unsigned int j=0; j<3; j++) {
