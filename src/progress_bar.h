@@ -42,6 +42,7 @@ private:
     unsigned int number_of_ticks;
     bool flag_ended;
     size_t length_of_last_message_printed;
+    bool has_tty;
 
     std::chrono::time_point<std::chrono::system_clock> start;
 

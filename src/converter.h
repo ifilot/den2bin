@@ -26,6 +26,8 @@
 #include <fstream>
 #include <iostream>
 #include <chrono>
+#include <unistd.h>
+#include <stdio.h>
 
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/copy.hpp>

@@ -44,12 +44,20 @@ ProgressBar::ProgressBar(uint32_t expectedIterations, const std::string& initial
     number_of_ticks(0),
     flag_ended(false) {
 
-    std::cout << initialMessage << "\n";
-    length_of_last_message_printed = initialMessage.size();
-    std::cout << generate_progress_bar(0) << "\r" << std::flush;
+    // check if tty
+    this->has_tty = isatty(fileno(stdout));
+
+    if(this->has_tty) {
+        std::cout << initialMessage << "\n";
+        length_of_last_message_printed = initialMessage.size();
+    }
 
     // set start point
     this->start = std::chrono::system_clock::now();
+
+    if(this->has_tty) {
+        std::cout << generate_progress_bar(0) << "\r" << std::flush;
+    }
 }
 
 ProgressBar::~ProgressBar() {
@@ -59,6 +67,10 @@ ProgressBar::~ProgressBar() {
 void ProgressBar::operator++() {
     if (flag_ended) {
         throw std::runtime_error("Attempted to use progress bar after having terminated it");
+    }
+
+    if(!this->has_tty) {
+        return;
     }
 
     number_of_ticks = std::min(total_iterations, number_of_ticks+1);
@@ -105,7 +117,7 @@ void ProgressBar::update_last_printed_message(const std::string& message) {
 }
 
 void ProgressBar::end_progress_bar() {
-    if (!flag_ended) {
+    if (!flag_ended && this->has_tty) {
         std::cout << std::string(2, '\n');
     }
 
