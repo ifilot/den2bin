@@ -61,3 +61,19 @@ Example:
 For the lossless compression, the final binary file has a compression ratio of 10-12. For example, a 300 MB file will be reduced to less than 30 MB. The compression is done in less than 5 seconds.
 
 For lossy compression, the compression ratio can be as large as 250. For example, a 500 MB file will be reduced to about 2 MB. Compression times are typically between 1-10 seconds (tested on a i7-4790K using 8 threads).
+
+## Showcase
+
+All images have been generated using [EDP](https://github.com/ifilot/edp).
+
+### CHGCAR files
+
+Recommended setting for CHGCAR is `Blocksize 4, Quality 4`
+
+![CHGCAR compression as a function of blocksize and quality](https://raw.githubusercontent.com/ifilot/den2bin/master/examples/chgcar.jpg)
+
+### LOCPOT files
+
+Recommended setting for LOCPOT is `Blocksize 4, Quality 6`
+
+![LOCPOT compression as a function of blocksize and quality](https://raw.githubusercontent.com/ifilot/den2bin/master/examples/locpot.jpg)
