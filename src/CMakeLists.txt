@@ -81,12 +81,9 @@ file(GLOB_RECURSE SOURCES "*.cpp")
 add_executable(den2bin ${SOURCES})
 
 # Set C++14
-add_definitions(-std=c++17 -march=native)
+add_definitions(-std=c++14)
 
 # Link libraries
-if(UNIX AND NOT APPLE)
-    SET(CMAKE_EXE_LINKER_FLAGS "-Wl,-rpath=\$ORIGIN/lib")
-endif()
 if(APPLE)
     SET(CMAKE_MACOSX_RPATH TRUE)
     SET_TARGET_PROPERTIES(den2bin PROPERTIES INSTALL_RPATH "@executable_path/lib")
