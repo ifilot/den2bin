@@ -4,6 +4,26 @@ Tool that converts VASP density file (CHGCAR/LOCPOT) to a binary file
 ## Purpose
 den2bin can compress CHGCAR/LOCPOT files either lossless or lossy. In the latter procedure, a 3D discrete cosine transformation is used wherein the higher frequency cosine coefficients are dropped (similar in the JPEG format).
 
+## Obtaining den2bin from the repository
+
+Install the GPG key
+
+```
+wget -O - http://www.zuidcoach.nl/repos/apt/conf/ivofilotsoftware.gpg.key|sudo apt-key add -
+```
+Add repository
+
+```
+echo "deb http://zuidcoach.nl/repos/apt/debian/ ivofilot-software main" | sudo tee -a /etc/apt/sources.list.d/ivofilot-software.list
+```
+
+Update apt sources and install `den2bin`
+
+```
+sudo apt-get update
+sudo apt-get install den2bin
+```
+
 ## Compilation
 den2bin requires the following packages (tested on Debian)
 * libboost
